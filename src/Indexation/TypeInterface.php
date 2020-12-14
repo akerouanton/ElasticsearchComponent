@@ -10,6 +10,8 @@ interface TypeInterface
 
     public function update($object, $id);
 
+    public function upsert($object, $id);
+
     public function stageForInsert(array $object, $id = null);
 
     public function flush();

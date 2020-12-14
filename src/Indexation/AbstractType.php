@@ -67,6 +67,26 @@ abstract class AbstractType implements TypeInterface
         }
     }
 
+    public function upsert($object, $id)
+    {
+        if (!$this->type) {
+            throw new NoElasticaTypeAvailable();
+        }
+
+        $doc = new Document($id, $object);
+        $doc->setDocAsUpsert(true);
+
+        try {
+            $this->type->updateDocument($doc);
+        } catch (ResponseException $exception) {
+            if ('document_missing_exception' === $exception->getResponse()->getFullError()['type']) {
+                throw new DocumentNotFoundException($exception);
+            }
+
+            throw $exception;
+        }
+    }
+
     public function stageForInsert(array $object, $id = null)
     {
         $this->stagedForInsert[] = new Document($id, $object);
